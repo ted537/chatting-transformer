@@ -7,13 +7,13 @@ Degeneration methods
 def greedy_decoding() -> GenerateSettings:
     return {}
 
-def beam_search(num_beams:int) -> GenerateSettings:
+def beam_search(num_beams:int=5) -> GenerateSettings:
     return {
         'early_stopping': True,
         'num_beams':num_beams
     }
 
-def generic_sampling(temperature=0.7) -> GenerateSettings:
+def generic_sampling(temperature:float=0.7) -> GenerateSettings:
     return {
         'do_sample': True,
         'temperature': temperature
