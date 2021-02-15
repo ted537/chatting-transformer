@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from transformers import AutoTokenizer, AutoModelForCausalLM, PreTrainedModel
 from transformers.tokenization_utils_base import PreTrainedTokenizerBase
 
-from chattingtransformer.settings import POSSIBLE_METHODS, default_settings
+from chattingtransformer.settings import default_settings, GenerateSettings
 
 # https://stackoverflow.com/questions/5574702/how-to-print-to-stderr-in-python
 def eprint(*args,**kwargs):
@@ -36,7 +36,10 @@ class ChattingGPT2:
     """
 
     @staticmethod
-    def from_pretrained(model_name: str, model_type: str):
+    def from_pretrained(
+        model_name: str = 'gpt2', model_type: str = 'gpt2',
+        settings: GenerateSettings = None
+    ):
         if model_name not in VALID_MODELS:
             raise ValueError(f'"{model_name}" is not a valid model')
 
@@ -50,7 +53,8 @@ class ChattingGPT2:
 
         eprint(f'Done loading "{model_name}"')
 
-        return ChattingGPT2(model, tokenizer, default_settings())
+        settings = settings or default_settings()
+        return ChattingGPT2(model, tokenizer, settings)
 
     def _assert_valid_generate_text(self, text: str) -> None:
         if not isinstance(text, str):
@@ -80,20 +84,5 @@ class ChattingGPT2:
             generated_tokens, skip_special_tokens=True
         )
         
-
-
-    def __gt_post_processing(self, result, text, combine):
-        """
-        A method for processing the output of the model. More features will be added later.
-
-        :param result: result the output of the model after being decoded
-        :param text:  the original input to generate_text
-        "parm combine: if true, returns  text and result concatenate together.
-        :return: returns to text after going through  post-processing
-        """
-
-        if combine:
-            return result
-
-        return result[len(text):]
-
+        start_idx = 0 if include_starting_text else len(starting_text)
+        return generated_text[start_idx:]
